@@ -25,7 +25,7 @@ variable "description" {
 variable "tags" {
   type        = list(string)
   description = "Tags that should be applied to the service"
-  default     = null
+  default     = []
 }
 
 ########## access group memebers ######################

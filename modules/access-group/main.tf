@@ -6,8 +6,8 @@
 resource "ibm_iam_access_group" "accgroup" {
   count       = var.provision ? 1 : 0
   name        = var.name
-  description = (var.description != null ? var.description : null)
-  tags        = (var.tags != null ? var.tags : null)
+  description = var.description
+  tags        = var.tags
 }
 
 data "ibm_iam_access_group" "accgroupdata" {
@@ -31,7 +31,7 @@ resource "ibm_iam_access_group_policy" "policy" {
   tags               = (each.value["tags"] != null ? each.value["tags"] : null)
 
   dynamic "resources" {
-    for_each = lookup(each.value["resources"], [])
+    for_each = lookup(each.value, "resources", [])
     content {
       region               = (resources.value.region != null ? resources.value.region : null)
       attributes           = (resources.value.attributes != null ? resources.value.attributes : null)
