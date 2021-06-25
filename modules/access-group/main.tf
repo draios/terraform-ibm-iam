@@ -30,8 +30,8 @@ resource "ibm_iam_access_group_policy" "policy" {
   account_management = (each.value["account_management"] != null ? each.value["account_management"] : null)
   tags               = (each.value["tags"] != null ? each.value["tags"] : null)
 
-  dynamic resources {
-    for_each = (each.value["resources"] != null ? each.value["resources"] : [])
+  dynamic "resources" {
+    for_each = lookup(each.value["resources"], [])
     content {
       region               = (resources.value.region != null ? resources.value.region : null)
       attributes           = (resources.value.attributes != null ? resources.value.attributes : null)
@@ -43,8 +43,8 @@ resource "ibm_iam_access_group_policy" "policy" {
     }
   }
 
-  dynamic resource_attributes {
-    for_each = (each.value["resource_attributes"] != null ? each.value["resource_attributes"] : [])
+  dynamic "resource_attributes" {
+    for_each = lookup(each.value["resource_attributes"], [])
     content {
       name     = resource_attributes.value.name
       value    = resource_attributes.value.value
@@ -62,8 +62,8 @@ resource "ibm_iam_access_group_dynamic_rule" "accgroup" {
   expiration        = each.value["expiration"]
   identity_provider = each.value["identity_provider"]
 
-  dynamic conditions {
-    for_each = each.value["rule_conditions"]
+  dynamic "conditions" {
+    for_each = lookup(each.value["rule_conditions"], [])
     content {
       claim    = conditions.value.claim
       operator = conditions.value.operator
