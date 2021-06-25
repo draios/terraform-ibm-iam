@@ -48,9 +48,9 @@ variable "service_ids" {
 variable "policies" {
   description = "list of policies"
   type = map(object({
-    "role"               = list(string),
-    "account_management" = bool,
-    "tags"               = list(string),
+    roles                = list(string),
+    account_management   = bool,
+    tags                 = list(string),
     resources_attributes = list(any),
     resources            = list(any)
   }))
