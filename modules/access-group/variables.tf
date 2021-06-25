@@ -47,13 +47,14 @@ variable "service_ids" {
 # TODO: perform a proper validation of the policies
 variable "policies" {
   description = "list of policies"
-  type = map(object({
-    roles                = list(string),
-    account_management   = bool,
-    tags                 = list(string),
-    resources_attributes = list(any),
-    resources            = list(any)
-  }))
+  type        = map(any)
+  # type = map(object({
+  #   roles                = list(string),
+  #   account_management   = bool,
+  #   tags                 = list(string),
+  #   resources_attributes = list(any),
+  #   resources            = list(any)
+  # }))
   # validation {
   #   condition     = length(var.image_id) > 4 && substr(var.image_id, 0, 4) == "ami-"
   #   error_message = "The image_id value must be a valid AMI id, starting with \"ami-\"."
