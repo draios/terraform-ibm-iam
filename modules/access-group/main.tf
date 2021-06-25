@@ -17,8 +17,8 @@ data "ibm_iam_access_group" "accgroupdata" {
 
 resource "ibm_iam_access_group_members" "accgroupmem" {
   access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
-  ibm_ids         = (var.ibm_ids != null ? var.ibm_ids : null)
-  iam_service_ids = (var.service_ids != null ? var.service_ids : null)
+  ibm_ids         = var.ibm_ids
+  iam_service_ids = var.service_ids
 }
 
 resource "ibm_iam_access_group_policy" "policy" {
@@ -26,20 +26,20 @@ resource "ibm_iam_access_group_policy" "policy" {
 
   for_each = var.policies
 
-  roles              = each.value["roles"]
-  account_management = (each.value["account_management"] != null ? each.value["account_management"] : null)
-  tags               = (each.value["tags"] != null ? each.value["tags"] : null)
+  roles              = lookup(each.value, "roles", [])
+  account_management = lookup(each.value, "account_management", null)
+  tags               = lookup(each.value, "tags", null)
 
   dynamic "resources" {
     for_each = lookup(each.value, "resources", [])
     content {
       region               = lookup(resources.value, "region", null)
-      attributes           = (resources.value.attributes != null ? resources.value.attributes : null)
-      service              = (resources.value.service != null ? resources.value.service : null)
-      resource_instance_id = (resources.value.resource_instance_id != null ? resources.value.resource_instance_id : null)
-      resource_type        = (resources.value.resource_type != null ? resources.value.resource_type : null)
-      resource             = (resources.value.resource != null ? resources.value.resource : null)
-      resource_group_id    = (resources.value.resource_group_id != null ? resources.value.resource_group_id : null)
+      attributes           = lookup(resources.value, "attributes", null)
+      service              = lookup(resources.value, "service", null)
+      resource_instance_id = lookup(resources.value, "resource_instance_id", null)
+      resource_type        = lookup(resources.value, "resource_type", null)
+      resource             = lookup(resources.value, "resource", null)
+      resource_group_id    = lookup(resources.value, "resource_group_id", null)
     }
   }
 
@@ -48,7 +48,7 @@ resource "ibm_iam_access_group_policy" "policy" {
     content {
       name     = resource_attributes.value.name
       value    = resource_attributes.value.value
-      operator = lookup(resource_attributes.value, "operator", null)
+      operator = lookup(resource_attributes.value, "operator", null) # The provider will set a stringEquals as default if null
     }
   }
 }
