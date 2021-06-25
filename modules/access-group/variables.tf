@@ -44,6 +44,7 @@ variable "service_ids" {
 
 ########## access group policy ######################
 
+# TODO: perform a proper validation of the policies
 variable "policies" {
   description = "list of policies"
   type        = map(any)
@@ -51,10 +52,8 @@ variable "policies" {
 
 ########## access group rule ######################
 
+# TODO: perform a proper validation of the dynamic_rules
 variable "dynamic_rules" {
   description = "list of dynamic rules"
   type        = map(any)
 }
-
-
-

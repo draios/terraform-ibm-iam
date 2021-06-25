@@ -21,14 +21,13 @@ resource "ibm_iam_access_group_members" "accgroupmem" {
   iam_service_ids = var.service_ids
 }
 
-resource "ibm_iam_access_group_policy" "policy" {
+resource "ibm_iam_access_group_policy" "policy_resources" {
+  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.resources }
+
   access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
 
-  for_each = var.policies
-
-  roles              = lookup(each.value, "roles", [])
-  account_management = lookup(each.value, "account_management", null)
-  tags               = lookup(each.value, "tags", null)
+  roles = lookup(each.value, "roles", [])
+  tags  = lookup(each.value, "tags", null)
 
   dynamic "resources" {
     for_each = lookup(each.value, "resources", [])
@@ -43,6 +42,16 @@ resource "ibm_iam_access_group_policy" "policy" {
     }
   }
 
+}
+
+resource "ibm_iam_access_group_policy" "policy_resource_attributes" {
+  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.resource_attributes }
+
+  access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
+
+  roles = lookup(each.value, "roles", [])
+  tags  = lookup(each.value, "tags", null)
+
   dynamic "resource_attributes" {
     for_each = lookup(each.value, "resource_attributes", [])
     content {
@@ -51,6 +60,17 @@ resource "ibm_iam_access_group_policy" "policy" {
       operator = lookup(resource_attributes.value, "operator", null) # The provider will set a stringEquals as default if null
     }
   }
+}
+
+resource "ibm_iam_access_group_policy" "policy_account_management" {
+  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.account_management }
+
+  access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
+
+  roles              = lookup(each.value, "roles", [])
+  account_management = lookup(each.value, "account_management")
+  tags               = lookup(each.value, "tags", null)
+
 }
 
 resource "ibm_iam_access_group_dynamic_rule" "accgroup" {
