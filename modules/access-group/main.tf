@@ -44,7 +44,7 @@ resource "ibm_iam_access_group_policy" "policy" {
   }
 
   dynamic "resource_attributes" {
-    for_each = lookup(each.value["resource_attributes"], [])
+    for_each = lookup(each.value, "resource_attributes", [])
     content {
       name     = resource_attributes.value.name
       value    = resource_attributes.value.value
@@ -63,7 +63,7 @@ resource "ibm_iam_access_group_dynamic_rule" "accgroup" {
   identity_provider = each.value["identity_provider"]
 
   dynamic "conditions" {
-    for_each = lookup(each.value["rule_conditions"], [])
+    for_each = lookup(each.value, "rule_conditions", [])
     content {
       claim    = conditions.value.claim
       operator = conditions.value.operator
