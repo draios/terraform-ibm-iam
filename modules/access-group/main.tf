@@ -22,7 +22,7 @@ resource "ibm_iam_access_group_members" "accgroupmem" {
 }
 
 resource "ibm_iam_access_group_policy" "policy_resources" {
-  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.resources != [] }
+  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if length(policy_content.resources) > 0 }
 
   access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
 
@@ -30,7 +30,7 @@ resource "ibm_iam_access_group_policy" "policy_resources" {
   tags  = lookup(each.value, "tags", null)
 
   dynamic "resources" {
-    for_each = lookup(each.value, "resources", [])
+    for_each = each.value.resources
     content {
       region               = lookup(resources.value, "region", null)
       attributes           = lookup(resources.value, "attributes", null)
@@ -45,7 +45,7 @@ resource "ibm_iam_access_group_policy" "policy_resources" {
 }
 
 resource "ibm_iam_access_group_policy" "policy_resource_attributes" {
-  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.resource_attributes != [] }
+  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if length(policy_content.resource_attributes) > 0 }
 
   access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
 
@@ -53,7 +53,7 @@ resource "ibm_iam_access_group_policy" "policy_resource_attributes" {
   tags  = lookup(each.value, "tags", null)
 
   dynamic "resource_attributes" {
-    for_each = lookup(each.value, "resource_attributes", [])
+    for_each = each.value.resource_attributes
     content {
       name     = resource_attributes.value.name
       value    = resource_attributes.value.value
@@ -63,12 +63,12 @@ resource "ibm_iam_access_group_policy" "policy_resource_attributes" {
 }
 
 resource "ibm_iam_access_group_policy" "policy_account_management" {
-  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.account_management != null }
+  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.account_management }
 
   access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
 
   roles              = lookup(each.value, "roles", [])
-  account_management = lookup(each.value, "account_management")
+  account_management = each.value.account_management
   tags               = lookup(each.value, "tags", null)
 
 }
