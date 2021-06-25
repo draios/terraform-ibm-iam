@@ -33,7 +33,7 @@ resource "ibm_iam_access_group_policy" "policy" {
   dynamic "resources" {
     for_each = lookup(each.value, "resources", [])
     content {
-      region               = (resources.value.region != null ? resources.value.region : null)
+      region               = lookup(resources.value, "region", null)
       attributes           = (resources.value.attributes != null ? resources.value.attributes : null)
       service              = (resources.value.service != null ? resources.value.service : null)
       resource_instance_id = (resources.value.resource_instance_id != null ? resources.value.resource_instance_id : null)
@@ -48,7 +48,7 @@ resource "ibm_iam_access_group_policy" "policy" {
     content {
       name     = resource_attributes.value.name
       value    = resource_attributes.value.value
-      operator = (resource_attributes.value.operator != null ? resource_attributes.value.operator : null)
+      operator = lookup(resource_attributes.value, "operator", null)
     }
   }
 }
