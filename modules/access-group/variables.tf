@@ -44,21 +44,35 @@ variable "service_ids" {
 
 ########## access group policy ######################
 
-# TODO: perform a proper validation of the policies
 variable "policies" {
   description = "list of policies"
-  type        = map(any)
-  # type = map(object({
-  #   roles                = list(string),
-  #   account_management   = bool,
-  #   tags                 = list(string),
-  #   resources_attributes = list(any),
-  #   resources            = list(any)
-  # }))
-  # validation {
-  #   condition     = length(var.image_id) > 4 && substr(var.image_id, 0, 4) == "ami-"
-  #   error_message = "The image_id value must be a valid AMI id, starting with \"ami-\"."
-  # }
+  type = map(object({
+    roles              = list(string)
+    account_management = bool
+    tags               = list(string)
+    resource_attributes = list(object({
+      name     = string
+      value    = string
+      operator = string
+    })),
+    resources = list(object({
+      region               = string
+      service              = string
+      resource_instance_id = string
+      resource_type        = string
+      resource             = string
+      resource_group_id    = string
+      attributes           = map(string)
+    }))
+  }))
+  validation {
+    condition     = length([for policy in var.policies : policy if policy.account_management == true && (length(policy.resource_attributes) > 0 || length(policy.resources) > 0)]) == 0
+    error_message = "You can't specify account_management as true with a list of resources or resource_attributes."
+  }
+  validation {
+    condition     = length([for policy in var.policies : policy if(length(policy.resource_attributes) > 0) && (length(policy.resources) > 0)]) == 0
+    error_message = "You can't specify both a list of resources and a list of resource_attributes."
+  }
 
 }
 
