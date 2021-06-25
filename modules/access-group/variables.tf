@@ -48,21 +48,21 @@ variable "policies" {
   description = "list of policies"
   type = map(object({
     roles              = list(string)
-    account_management = bool
     tags               = list(string)
-    resource_attributes = list(object({
-      name     = string
-      value    = string
-      operator = string
-    })),
+    account_management = bool
     resources = list(object({
-      region               = string
       service              = string
       resource_instance_id = string
+      region               = string
       resource_type        = string
       resource             = string
       resource_group_id    = string
       attributes           = map(string)
+    })),
+    resource_attributes = list(object({
+      name     = string
+      value    = string
+      operator = string
     }))
   }))
   validation {
