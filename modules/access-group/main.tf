@@ -21,16 +21,17 @@ resource "ibm_iam_access_group_members" "accgroupmem" {
   iam_service_ids = var.service_ids
 }
 
-resource "ibm_iam_access_group_policy" "policy_resources" {
-  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if length(policy_content.resources) > 0 }
+resource "ibm_iam_access_group_policy" "policies" {
+  for_each = var.policies
 
   access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
 
-  roles = lookup(each.value, "roles", [])
-  tags  = lookup(each.value, "tags", null)
+  roles              = lookup(each.value, "roles", [])
+  tags               = lookup(each.value, "tags", null)
+  account_management = lookup(each.value, "account_management", false)
 
   dynamic "resources" {
-    for_each = each.value.resources
+    for_each = lookup(each.value, "resources", {})
     content {
       region               = lookup(resources.value, "region", null)
       attributes           = lookup(resources.value, "attributes", null)
@@ -42,34 +43,14 @@ resource "ibm_iam_access_group_policy" "policy_resources" {
     }
   }
 
-}
-
-resource "ibm_iam_access_group_policy" "policy_resource_attributes" {
-  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if length(policy_content.resource_attributes) > 0 }
-
-  access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
-
-  roles = lookup(each.value, "roles", [])
-  tags  = lookup(each.value, "tags", null)
-
   dynamic "resource_attributes" {
-    for_each = each.value.resource_attributes
+    for_each = lookup(each.value, "resource_attributes", {})
     content {
       name     = resource_attributes.value.name
       value    = resource_attributes.value.value
       operator = lookup(resource_attributes.value, "operator", null) # The provider will set a stringEquals as default if null
     }
   }
-}
-
-resource "ibm_iam_access_group_policy" "policy_account_management" {
-  for_each = { for policy_name, policy_content in var.policies : policy_name => policy_content if policy_content.account_management }
-
-  access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
-
-  roles              = lookup(each.value, "roles", [])
-  account_management = each.value.account_management
-  tags               = lookup(each.value, "tags", null)
 
 }
 

@@ -22,7 +22,5 @@ output "member_id" {
 
 output "policy_ids" {
   description = "List of access group policy IDs"
-  value = toset([
-    for policy in merge(ibm_iam_access_group_policy.policy_resources, ibm_iam_access_group_policy.policy_resource_attributes, ibm_iam_access_group_policy.policy_account_management) : policy.id
-  ])
+  value       = toset([for policy in ibm_iam_access_group_policy.policies : policy.id])
 }
