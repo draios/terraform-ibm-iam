@@ -44,36 +44,42 @@ variable "service_ids" {
 
 ########## access group policy ######################
 
+# TODO: this fight is for another day
+
+# variable "policies" {
+#   description = "list of policies"
+#   type = map(object({
+#     roles              = list(string)
+#     tags               = list(string)
+#     account_management = bool
+#     resources = list(object({
+#       service              = string
+#       resource_instance_id = string
+#       region               = string
+#       resource_type        = string
+#       resource             = string
+#       resource_group_id    = string
+#       attributes           = map(string)
+#     })),
+#     resource_attributes = list(object({
+#       name     = string
+#       value    = string
+#       operator = string
+#     }))
+#   }))
+#   validation {
+#     condition     = length([for policy in var.policies : policy if policy.account_management == true && (length(policy.resource_attributes) > 0 || length(policy.resources) > 0)]) == 0
+#     error_message = "You can't specify account_management as true with a list of resources or resource_attributes."
+#   }
+#   validation {
+#     condition     = length([for policy in var.policies : policy if(length(policy.resource_attributes) > 0) && (length(policy.resources) > 0)]) == 0
+#     error_message = "You can't specify both a list of resources and a list of resource_attributes."
+#   }
+# }
+
 variable "policies" {
   description = "list of policies"
-  type = map(object({
-    roles              = list(string)
-    tags               = list(string)
-    account_management = bool
-    resources = list(object({
-      service              = string
-      resource_instance_id = string
-      region               = string
-      resource_type        = string
-      resource             = string
-      resource_group_id    = string
-      attributes           = map(string)
-    })),
-    resource_attributes = list(object({
-      name     = string
-      value    = string
-      operator = string
-    }))
-  }))
-  validation {
-    condition     = length([for policy in var.policies : policy if policy.account_management == true && (length(policy.resource_attributes) > 0 || length(policy.resources) > 0)]) == 0
-    error_message = "You can't specify account_management as true with a list of resources or resource_attributes."
-  }
-  validation {
-    condition     = length([for policy in var.policies : policy if(length(policy.resource_attributes) > 0) && (length(policy.resources) > 0)]) == 0
-    error_message = "You can't specify both a list of resources and a list of resource_attributes."
-  }
-
+  type        = map(any)
 }
 
 ########## access group rule ######################

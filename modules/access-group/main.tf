@@ -26,9 +26,9 @@ resource "ibm_iam_access_group_policy" "policies" {
 
   access_group_id = var.provision ? ibm_iam_access_group.accgroup[0].id : data.ibm_iam_access_group.accgroupdata[0].groups[0].id
 
-  roles              = lookup(each.value, "roles", [])
-  tags               = lookup(each.value, "tags", null)
-  account_management = lookup(each.value, "account_management", false)
+  roles = lookup(each.value, "roles", [])
+  tags  = lookup(each.value, "tags", null)
+  # account_management = lookup(each.value, "account_management", null)
 
   dynamic "resources" {
     for_each = lookup(each.value, "resources", {})
